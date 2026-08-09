@@ -2,7 +2,7 @@
 
 A modern Next.js application bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## 📋 Table of Contents
+## 📋 Table of Content
 
 1. [Getting Started](#getting-started)
 2. [Tech Stack](#tech-stack)
