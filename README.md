@@ -14,7 +14,7 @@ A modern Next.js application bootstrapped with [`create-next-app`](https://nextj
 
 ## <a name="getting-started">🚀 Getting Started</a>
 
-### Prerequisites
+### Prerequisite
 
 Make sure you have the following installed:
 - [Node.js](https://nodejs.org/) (18.x or later)
