@@ -1,6 +1,6 @@
 # Next.js App 🚀
 
-A modern Next.js application bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+A modern Next.js application bootstrappe with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## 📋 Table of Content
 
