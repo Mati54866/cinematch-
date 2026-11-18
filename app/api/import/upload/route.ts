@@ -5,6 +5,8 @@ import { parseLetterboxd, parseIMDb, parseGenericCSV, detectSource } from '@/lib
 import { matchBatch } from '@/lib/import/matcher'
 import type { ImportSource } from '@/lib/import/types'
 
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024 // 5 MB
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -19,6 +21,14 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+    }
+
+    // Reject oversized files before reading them into memory
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return NextResponse.json(
+        { error: 'File too large. Maximum size is 5 MB' },
+        { status: 413 }
+      )
     }
 
     // Validate file type
