@@ -9,6 +9,11 @@ export async function DELETE(
   try {
     const { id } = await params
 
+    const itemId = Number(id)
+    if (!Number.isInteger(itemId) || itemId <= 0) {
+      return NextResponse.json({ error: 'Invalid watchlist item id' }, { status: 400 })
+    }
+
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
@@ -22,7 +27,7 @@ export async function DELETE(
     const { error: deleteError, count } = await admin
       .from('watchlist')
       .delete({ count: 'exact' })
-      .eq('id', parseInt(id, 10))
+      .eq('id', itemId)
       .eq('user_id', user.id)
 
     if (deleteError) {
