@@ -6,13 +6,23 @@ on:
   pull_request:
     branches: [ main, master ]
 
+# Cancel superseded runs for the same branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   build-and-verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        # Next.js 16 requires Node.js >= 20.9
+        node-version: [20.x, 22.x]
 
     steps:
       - name: Checkout Code
@@ -28,7 +38,7 @@ jobs:
         run: npm ci
 
       - name: TypeScript Typecheck
-        run: npm run typecheck || npx tsc --noEmit
+        run: npm run typecheck
         continue-on-error: true
 
       - name: ESLint Code Quality
