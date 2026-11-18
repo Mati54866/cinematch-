@@ -39,7 +39,7 @@
     "posthog-js": "^1.359.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "recharts": "^3.8.0",
+    "recharts": "^3.10.1",
     "resend": "^6.9.3",
     "stripe": "^20.4.1",
     "tailwind-merge": "^3.5.0",
