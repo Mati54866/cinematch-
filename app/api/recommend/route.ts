@@ -8,10 +8,10 @@ import { DEFAULT_AI_MODEL } from '@/lib/utils/constants'
 
 const recommendRequestSchema = z.object({
   query: z.string().min(1).max(500),
-  mood: z.string().optional(),
+  mood: z.string().max(200).optional(),
   streaming_only: z.boolean().optional(),
   exclude_watched: z.boolean().optional(),
-  count: z.number().min(1).max(20).optional(),
+  count: z.number().int().min(1).max(20).optional(),
 })
 
 export async function POST(request: NextRequest) {
