@@ -4,12 +4,12 @@
 CineMatch is an AI-powered movie recommendation app. Users describe what they want to watch in natural language, and the AI returns personalized picks filtered to their streaming services.
 
 ## Tech Stack
-- Next.js 15 (App Router, Server Components)
+- Next.js 16 (App Router, Server Components) on React 19
 - TypeScript (strict mode)
 - Supabase (PostgreSQL + pgvector + Auth)
-- Anthropic Claude Sonnet 4 (recommendations)
+- Anthropic Claude Sonnet 4 (recommendations; model ID lives in `DEFAULT_AI_MODEL` in lib/utils/constants.ts)
 - TMDB API (movie data + streaming availability)
-- Tailwind CSS + shadcn/ui (dark theme)
+- Tailwind CSS v4 + shadcn/ui-style Radix components (dark theme)
 - Zustand (client state)
 - Zod (validation)
 - Stripe (payments)

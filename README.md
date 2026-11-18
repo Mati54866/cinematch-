@@ -61,7 +61,7 @@
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v18 or later)
+- [Node.js](https://nodejs.org/) v20.9 or later (see `.nvmrc`)
 - [npm](https://www.npmjs.com/) or `pnpm`
 
 ### Installation
@@ -88,6 +88,46 @@
    npm run dev
    ```
    Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## <a name="architecture--database">🛠️ Architecture & Database</a>
+
+The recommendation flow lives in `lib/ai/recommend.ts` and runs five steps:
+
+1. **Parse** the natural-language query (mood, themes, genre hints, social context).
+2. **Vector search** candidate movies with pgvector embeddings.
+3. **Filter** by streaming providers, runtime, and already-rated titles.
+4. **LLM ranking** with Claude, grounded in the user's taste profile.
+5. **Validate** every result against the `movies` table so only titles with a real `tmdb_id` are returned.
+
+| Path | Purpose |
+| --- | --- |
+| `app/(app)` / `app/(auth)` | Authenticated app pages and auth flows |
+| `app/api` | Route Handlers (recommend, watchlist, import, group, Stripe webhook, cron) |
+| `lib/ai` | Anthropic client, prompts, embeddings, validators |
+| `lib/tmdb` | TMDB client, movie sync, watch providers |
+| `lib/import` | Letterboxd / IMDb / CSV parsers and TMDB matcher |
+| `supabase/migrations` | PostgreSQL schema (with pgvector) |
+
+---
+
+## <a name="environment-variables">🔐 Environment Variables</a>
+
+Copy `.env.local.example` to `.env.local` and fill in the values below.
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase project connection |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Server-only admin access (never expose to the browser) |
+| `ANTHROPIC_API_KEY` | Yes | Claude recommendations |
+| `OPENAI_API_KEY` or `VOYAGE_API_KEY` | Yes (one) | Embedding provider |
+| `TMDB_API_KEY` | Yes | Movie metadata and streaming availability |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_PRO_PRICE_ID` | For billing | Pro subscription checkout |
+| `RESEND_API_KEY` | Optional | Transactional email |
+| `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST` | Optional | Analytics |
+| `NEXT_PUBLIC_APP_URL` | Yes | Public base URL of the app |
+| `CRON_SECRET` | Yes in production | Bearer token required by `/api/cron/sync-movies` |
 
 ---
 
