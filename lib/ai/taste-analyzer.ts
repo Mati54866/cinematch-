@@ -1,6 +1,7 @@
 import { generateCompletion } from '@/lib/ai/anthropic'
 import { buildTasteSummaryPrompt } from '@/lib/ai/prompts/taste-summary'
 import { createClient } from '@supabase/supabase-js'
+import { DEFAULT_AI_MODEL } from '@/lib/utils/constants'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -258,7 +259,7 @@ export async function generateTasteSummary(profile: {
         content: 'Generate the taste profile summary now.',
       },
     ],
-    model: 'claude-sonnet-4-20250514',
+    model: DEFAULT_AI_MODEL,
     maxTokens: 512,
     temperature: 0.5,
   })

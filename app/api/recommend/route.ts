@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { recommend } from '@/lib/ai/recommend'
 import { checkRateLimit, incrementRateLimit } from '@/lib/utils/rate-limit'
 import { z } from 'zod'
+import { DEFAULT_AI_MODEL } from '@/lib/utils/constants'
 
 const recommendRequestSchema = z.object({
   query: z.string().min(1).max(500),
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
       query_text: query,
       mood_context: mood ? { mood } : null,
       movies_recommended: JSON.parse(JSON.stringify(recommendations)),
-      model_used: 'claude-sonnet-4-20250514',
+      model_used: DEFAULT_AI_MODEL,
       tokens_used: 0,
     })
 
@@ -135,7 +136,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       recommendations,
       query,
-      model: 'claude-sonnet-4-20250514',
+      model: DEFAULT_AI_MODEL,
     })
   } catch (error) {
     console.error('Recommendation error:', error)

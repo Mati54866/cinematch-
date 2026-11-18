@@ -50,6 +50,8 @@ export const DECADES = [
   '2020s', '2010s', '2000s', '1990s', '1980s', '1970s', '1960s', 'Classic',
 ] as const
 
+export const DEFAULT_AI_MODEL = 'claude-sonnet-4-20250514'
+
 export const FREE_TIER_DAILY_LIMIT = 5
 export const PRO_PLAN_ID = 'pro'
 

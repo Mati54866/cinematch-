@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { DEFAULT_AI_MODEL } from '@/lib/utils/constants'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -14,7 +15,7 @@ export async function generateCompletion(params: {
   const {
     system,
     messages,
-    model = 'claude-sonnet-4-20250514',
+    model = DEFAULT_AI_MODEL,
     maxTokens = 4096,
     temperature = 0.7,
   } = params
@@ -44,7 +45,7 @@ export async function generateJSON<T>(params: {
   const {
     system,
     prompt,
-    model = 'claude-sonnet-4-20250514',
+    model = DEFAULT_AI_MODEL,
     maxTokens = 4096,
   } = params
 

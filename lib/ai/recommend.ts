@@ -9,6 +9,7 @@ import {
 import type { RecommendationItem, CandidateMovie } from '@/lib/ai/validators'
 import type { TasteProfile } from '@/lib/ai/taste-analyzer'
 import { createClient } from '@supabase/supabase-js'
+import { DEFAULT_AI_MODEL } from '@/lib/utils/constants'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -242,7 +243,7 @@ export async function llmReason(
   const { data } = await generateJSON<RecommendationItem[]>({
     system: systemPrompt,
     prompt: `Select the best ${count} films from the candidate list and provide personalized explanations.`,
-    model: 'claude-sonnet-4-20250514',
+    model: DEFAULT_AI_MODEL,
     maxTokens: 4096,
   })
 

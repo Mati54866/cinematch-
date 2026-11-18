@@ -8,6 +8,7 @@ import { buildGroupMergePrompt } from '@/lib/ai/prompts/group-merge'
 import { validateRecommendations } from '@/lib/ai/validators'
 import type { RecommendationItem } from '@/lib/ai/validators'
 import { z } from 'zod'
+import { DEFAULT_AI_MODEL } from '@/lib/utils/constants'
 
 const groupRecommendSchema = z.object({
   query: z.string().min(1).max(500),
@@ -153,7 +154,7 @@ export async function POST(
     const { data: llmResults } = await generateJSON<RecommendationItem[]>({
       system: systemPrompt,
       prompt: `Select the best ${count} films for this group.`,
-      model: 'claude-sonnet-4-20250514',
+      model: DEFAULT_AI_MODEL,
       maxTokens: 4096,
     })
 
