@@ -39,12 +39,11 @@ export function slugify(text: string): string {
 }
 
 export function generateInviteCode(): string {
+  // 32-character alphabet divides 256 evenly, so there's no modulo bias.
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-  let code = ''
-  for (let i = 0; i < 8; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return code
+  const bytes = new Uint8Array(8)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, (b) => chars[b % chars.length]).join('')
 }
 
 export function clampRating(value: number, min: number = 0, max: number = 5): number {
