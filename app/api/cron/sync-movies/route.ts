@@ -1,16 +1,27 @@
+import { timingSafeEqual } from 'node:crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { getTrending } from '@/lib/tmdb/client'
 import { syncMovie } from '@/lib/tmdb/sync'
 import { syncWatchProviders } from '@/lib/tmdb/watch-providers'
 import { createAdminClient } from '@/lib/supabase/admin'
 
+function isAuthorized(authHeader: string | null, cronSecret: string): boolean {
+  const expected = Buffer.from(`Bearer ${cronSecret}`)
+  const received = Buffer.from(authHeader ?? '')
+  return expected.length === received.length && timingSafeEqual(expected, received)
+}
+
 export async function GET(request: NextRequest) {
   try {
-    // Verify CRON_SECRET
-    const authHeader = request.headers.get('authorization')
+    // Verify CRON_SECRET. Fail closed: if the secret isn't configured, the
+    // endpoint must not be publicly triggerable.
     const cronSecret = process.env.CRON_SECRET
+    if (!cronSecret) {
+      console.error('CRON_SECRET is not configured; refusing to run cron job')
+      return NextResponse.json({ error: 'Cron not configured' }, { status: 500 })
+    }
 
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    if (!isAuthorized(request.headers.get('authorization'), cronSecret)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
