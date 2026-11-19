@@ -202,7 +202,6 @@ export default function ProfilePage() {
         <div className="flex flex-wrap gap-2">
           {tasteProfile.themeCloud.map((theme, index) => {
             const sizes = ["text-sm", "text-base", "text-lg", "text-xl"];
-            const sizeIndex = Math.floor(Math.random() * sizes.length);
             return (
               <span
                 key={theme}

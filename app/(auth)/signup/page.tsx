@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Film, Github, Loader2 } from 'lucide-react'
+import { Film, GitBranch, Loader2 } from 'lucide-react'
 
 export default function SignUpPage() {
   const [name, setName] = useState('')
@@ -152,7 +152,7 @@ export default function SignUpPage() {
               {oauthLoading === 'github' ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                <Github className="mr-2 h-4 w-4" />
+                <GitBranch className="mr-2 h-4 w-4" />
               )}
               GitHub
             </Button>
