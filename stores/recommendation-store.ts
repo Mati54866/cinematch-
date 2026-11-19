@@ -26,7 +26,7 @@ interface RecommendationState {
 }
 
 function generateSessionId(): string {
-  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  return `session_${crypto.randomUUID()}`;
 }
 
 export const useRecommendationStore = create<RecommendationState>((set) => ({
