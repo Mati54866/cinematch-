@@ -168,6 +168,7 @@ export function ratingToReaction(rating: number): 'loved' | 'liked' | 'meh' | 'd
   if (rating >= 3.5) return 'liked'
   if (rating >= 2.5) return 'meh'
   if (rating >= 1.5) return 'disliked'
+  if (rating === 0) return 'skip'
   return 'disliked'
 }
 
