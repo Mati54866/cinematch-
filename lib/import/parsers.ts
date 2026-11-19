@@ -234,7 +234,7 @@ function parseCSVLine(line: string): string[] {
  */
 function findColumnIndex(headers: string[], possibleNames: string[]): number {
   for (let i = 0; i < headers.length; i++) {
-    const normalized = headers[i].toLowerCase().trim()
+    const normalized = headers[i].replace(/^\uFEFF/, '').toLowerCase().trim()
     if (possibleNames.includes(normalized)) return i
   }
   return -1
