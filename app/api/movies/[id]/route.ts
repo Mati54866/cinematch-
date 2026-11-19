@@ -10,9 +10,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const tmdbId = parseInt(id, 10)
+    const tmdbId = Number(id)
 
-    if (isNaN(tmdbId)) {
+    if (!/^\d+$/.test(id) || !Number.isSafeInteger(tmdbId) || tmdbId <= 0) {
       return NextResponse.json({ error: 'Invalid movie ID' }, { status: 400 })
     }
 
