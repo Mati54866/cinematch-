@@ -37,10 +37,18 @@ export async function PUT(request: NextRequest) {
     const admin = createAdminClient()
 
     // Delete existing services
-    await admin
+    const { error: deleteError } = await admin
       .from('user_streaming_services')
       .delete()
       .eq('user_id', user.id)
+
+    if (deleteError) {
+      console.error('Streaming services delete error:', deleteError)
+      return NextResponse.json(
+        { error: 'Failed to update streaming services' },
+        { status: 500 }
+      )
+    }
 
     // Insert new services
     if (provider_ids.length > 0) {
