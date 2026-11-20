@@ -91,9 +91,13 @@ export async function POST(
 
         if (insertError) {
           console.error('Batch insert error:', insertError)
-        } else {
-          imported += batch.length
+          return NextResponse.json(
+            { error: 'Failed to import ratings. Please retry confirmation.' },
+            { status: 500 }
+          )
         }
+
+        imported += batch.length
       }
     }
 
