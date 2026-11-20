@@ -18,7 +18,15 @@ export async function GET() {
       .eq('user_id', user.id)
       .single()
 
-    if (error || !profile) {
+    if (error && error.code !== 'PGRST116') {
+      console.error('Taste profile query error:', error)
+      return NextResponse.json(
+        { error: 'Failed to fetch taste profile' },
+        { status: 500 }
+      )
+    }
+
+    if (!profile) {
       return NextResponse.json(
         { error: 'Taste profile not found' },
         { status: 404 }
