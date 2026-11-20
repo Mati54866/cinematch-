@@ -19,7 +19,10 @@ export function getDecade(year: number): string {
 }
 
 export function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-US', {
+  const date = new Date(dateString)
+  if (Number.isNaN(date.getTime())) return 'N/A'
+
+  return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
