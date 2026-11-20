@@ -100,7 +100,7 @@ export async function POST(
     const skipped = alreadyRatedMovieIds.size
 
     // Update import job
-    await admin
+    const { error: updateError } = await admin
       .from('import_jobs')
       .update({
         status: 'completed' as const,
@@ -109,6 +109,14 @@ export async function POST(
         completed_at: new Date().toISOString(),
       })
       .eq('id', jobId)
+
+    if (updateError) {
+      console.error('Import job update error:', updateError)
+      return NextResponse.json(
+        { error: 'Ratings were imported but the import status could not be updated' },
+        { status: 500 }
+      )
+    }
 
     // Trigger taste recomputation (fire and forget)
     recomputeTasteProfile(user.id).catch((err) =>
