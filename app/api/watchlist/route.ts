@@ -84,12 +84,20 @@ export async function POST(request: NextRequest) {
     const admin = createAdminClient()
 
     // Check if already in watchlist
-    const { data: existing } = await admin
+    const { data: existing, error: existingError } = await admin
       .from('watchlist')
       .select('id')
       .eq('user_id', user.id)
       .eq('movie_id', movie_id)
-      .single()
+      .maybeSingle()
+
+    if (existingError) {
+      console.error('Watchlist duplicate lookup error:', existingError)
+      return NextResponse.json(
+        { error: 'Failed to check watchlist' },
+        { status: 500 }
+      )
+    }
 
     if (existing) {
       return NextResponse.json(
