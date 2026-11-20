@@ -11,7 +11,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Query parameter "q" is required' }, { status: 400 })
     }
 
-    const results = await searchMovies(query.trim(), { page: 1 })
+    const normalizedQuery = query.trim()
+    if (normalizedQuery.length > 200) {
+      return NextResponse.json(
+        { error: 'Search query must be 200 characters or fewer' },
+        { status: 400 }
+      )
+    }
+
+    const results = await searchMovies(normalizedQuery, { page: 1 })
 
     const movies = results.results.slice(0, 10).map((movie) => ({
       id: movie.id,
