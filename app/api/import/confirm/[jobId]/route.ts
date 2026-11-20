@@ -45,10 +45,18 @@ export async function POST(
 
     // Get movie ids for matched tmdb_ids
     const matchedTmdbIds = matched.map((m) => m.tmdb_id!).filter(Boolean)
-    const { data: movies } = await admin
+    const { data: movies, error: moviesError } = await admin
       .from('movies')
       .select('id, tmdb_id')
       .in('tmdb_id', matchedTmdbIds.length > 0 ? matchedTmdbIds : [0])
+
+    if (moviesError) {
+      console.error('Import movie lookup error:', moviesError)
+      return NextResponse.json(
+        { error: 'Failed to load imported movies' },
+        { status: 500 }
+      )
+    }
 
     const tmdbToMovieId = new Map((movies ?? []).map((m) => [m.tmdb_id, m.id]))
 
