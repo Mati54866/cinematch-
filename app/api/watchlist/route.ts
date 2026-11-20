@@ -37,10 +37,18 @@ export async function GET() {
     let movies: Record<number, { tmdb_id: number; title: string; poster_path: string | null; vote_average: number | null; runtime: number | null; genres: unknown }> = {}
 
     if (movieIds.length > 0) {
-      const { data: movieData } = await admin
+      const { data: movieData, error: movieError } = await admin
         .from('movies')
         .select('id, tmdb_id, title, poster_path, vote_average, runtime, genres')
         .in('id', movieIds)
+
+      if (movieError) {
+        console.error('Watchlist movie lookup error:', movieError)
+        return NextResponse.json(
+          { error: 'Failed to fetch watchlist movies' },
+          { status: 500 }
+        )
+      }
 
       movies = Object.fromEntries((movieData ?? []).map((m) => [m.id, m]))
     }
