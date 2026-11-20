@@ -21,14 +21,14 @@ export function parseLetterboxd(text: string): ImportEntry[] {
     const cols = parseCSVLine(lines[i])
     if (!cols[nameIdx]?.trim()) continue
 
-    const rawRating = ratingIdx !== -1 ? parseFloat(cols[ratingIdx]) : null
-    const normalizedRating = rawRating != null && !isNaN(rawRating)
+    const rawRating = ratingIdx !== -1 ? parseNumericCell(cols[ratingIdx]) : null
+    const normalizedRating = rawRating !== null
       ? normalizeRating(rawRating, 'letterboxd')
       : null
 
     entries.push({
       title: cols[nameIdx].trim(),
-      year: yearIdx !== -1 ? parseInt(cols[yearIdx], 10) || null : null,
+      year: yearIdx !== -1 ? parseYearCell(cols[yearIdx]) : null,
       rating: normalizedRating,
       imdb_id: null,
       source: 'letterboxd',
@@ -67,8 +67,8 @@ export function parseIMDb(text: string): ImportEntry[] {
       if (type && !type.includes('movie') && !type.includes('film')) continue
     }
 
-    const rawRating = ratingIdx !== -1 ? parseFloat(cols[ratingIdx]) : null
-    const normalizedRating = rawRating != null && !isNaN(rawRating)
+    const rawRating = ratingIdx !== -1 ? parseNumericCell(cols[ratingIdx]) : null
+    const normalizedRating = rawRating !== null
       ? normalizeRating(rawRating, 'imdb')
       : null
 
@@ -76,7 +76,7 @@ export function parseIMDb(text: string): ImportEntry[] {
 
     entries.push({
       title: cols[titleIdx].trim(),
-      year: yearIdx !== -1 ? parseInt(cols[yearIdx], 10) || null : null,
+      year: yearIdx !== -1 ? parseYearCell(cols[yearIdx]) : null,
       rating: normalizedRating,
       imdb_id: imdbId && imdbId.startsWith('tt') ? imdbId : null,
       source: 'imdb',
@@ -108,8 +108,8 @@ export function parseGenericCSV(text: string): ImportEntry[] {
   for (let i = 1; i < Math.min(lines.length, 20); i++) {
     const cols = parseCSVLine(lines[i])
     if (ratingIdx !== -1 && cols[ratingIdx]) {
-      const val = parseFloat(cols[ratingIdx])
-      if (!isNaN(val)) sampleRatings.push(val)
+      const val = parseNumericCell(cols[ratingIdx])
+      if (val !== null) sampleRatings.push(val)
     }
   }
   const scale = detectRatingScale(sampleRatings)
@@ -122,8 +122,8 @@ export function parseGenericCSV(text: string): ImportEntry[] {
 
     let rating: number | null = null
     if (ratingIdx !== -1 && cols[ratingIdx]) {
-      const rawVal = parseFloat(cols[ratingIdx])
-      if (!isNaN(rawVal)) {
+      const rawVal = parseNumericCell(cols[ratingIdx])
+      if (rawVal !== null) {
         rating = normalizeToFiveScale(rawVal, scale)
       }
     }
@@ -132,7 +132,7 @@ export function parseGenericCSV(text: string): ImportEntry[] {
 
     entries.push({
       title: cols[titleIdx].trim(),
-      year: yearIdx !== -1 ? parseInt(cols[yearIdx], 10) || null : null,
+      year: yearIdx !== -1 ? parseYearCell(cols[yearIdx]) : null,
       rating,
       imdb_id: imdbId && imdbId.startsWith('tt') ? imdbId : null,
       source: 'csv',
@@ -140,6 +140,19 @@ export function parseGenericCSV(text: string): ImportEntry[] {
   }
 
   return entries
+}
+
+function parseNumericCell(value: string | undefined): number | null {
+  const trimmed = value?.trim()
+  if (!trimmed || !/^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(trimmed)) return null
+
+  const parsed = Number(trimmed)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+function parseYearCell(value: string | undefined): number | null {
+  const year = parseNumericCell(value)
+  return year !== null && Number.isInteger(year) && year > 0 ? year : null
 }
 
 /**
