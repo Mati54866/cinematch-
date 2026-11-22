@@ -6,11 +6,11 @@ import { z } from 'zod'
 const updateStreamingSchema = z.object({
   provider_ids: z.array(
     z.object({
-      id: z.number(),
-      name: z.string(),
-      logo: z.string(),
+      id: z.number().int().positive(),
+      name: z.string().trim().min(1).max(100),
+      logo: z.string().max(500),
     })
-  ),
+  ).max(50),
 })
 
 export async function PUT(request: NextRequest) {
