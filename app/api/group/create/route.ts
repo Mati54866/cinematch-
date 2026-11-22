@@ -65,10 +65,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Add creator as member
-    await admin.from('group_members').insert({
+    const { error: memberError } = await admin.from('group_members').insert({
       group_id: group.id,
       user_id: user.id,
     })
+
+    if (memberError) {
+      console.error('Group creator membership insert error:', memberError)
+      const { error: cleanupError } = await admin
+        .from('groups')
+        .delete()
+        .eq('id', group.id)
+
+      if (cleanupError) {
+        console.error('Failed to clean up group after membership insert error:', cleanupError)
+      }
+
+      return NextResponse.json(
+        { error: 'Failed to add group creator as a member' },
+        { status: 500 }
+      )
+    }
 
     const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://cinematch.app'}/group/join?code=${inviteCode}`
 
