@@ -43,6 +43,25 @@ export async function POST(
     const { query, mood, count = 5 } = parsed.data
     const admin = createAdminClient()
 
+    const { data: membership, error: membershipError } = await admin
+      .from('group_members')
+      .select('id')
+      .eq('group_id', groupId)
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    if (membershipError) {
+      console.error('Group recommendation membership lookup error:', membershipError)
+      return NextResponse.json(
+        { error: 'Failed to verify group membership' },
+        { status: 500 }
+      )
+    }
+
+    if (!membership) {
+      return NextResponse.json({ error: 'Group not found' }, { status: 404 })
+    }
+
     // Get group members
     const { data: members } = await admin
       .from('group_members')
