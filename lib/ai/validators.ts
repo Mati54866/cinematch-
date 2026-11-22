@@ -28,10 +28,12 @@ export function validateRecommendations(
 ): { valid: RecommendationItem[]; invalid: RecommendationItem[] } {
   const valid: RecommendationItem[] = []
   const invalid: RecommendationItem[] = []
+  const seenIds = new Set<number>()
 
   for (const rec of recs) {
-    if (validIds.has(rec.tmdb_id)) {
+    if (validIds.has(rec.tmdb_id) && !seenIds.has(rec.tmdb_id)) {
       valid.push(rec)
+      seenIds.add(rec.tmdb_id)
     } else {
       invalid.push(rec)
     }
