@@ -13,7 +13,7 @@ import { DEFAULT_AI_MODEL } from '@/lib/utils/constants'
 const groupRecommendSchema = z.object({
   query: z.string().min(1).max(500),
   mood: z.string().optional(),
-  count: z.number().min(1).max(20).optional(),
+  count: z.number().int().min(1).max(20).optional(),
 })
 
 export async function POST(
