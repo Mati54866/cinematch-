@@ -43,6 +43,11 @@ export function StarRating({
   const handleClick = useCallback(
     (starIndex: number, e: React.MouseEvent<HTMLButtonElement>) => {
       if (readOnly || !onRate) return
+      if (e.detail === 0) {
+        onRate(starIndex + 1)
+        return
+      }
+
       const rect = e.currentTarget.getBoundingClientRect()
       const x = e.clientX - rect.left
       const isHalf = x < rect.width / 2
