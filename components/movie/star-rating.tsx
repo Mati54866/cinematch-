@@ -72,6 +72,8 @@ export function StarRating({
             key={i}
             type="button"
             disabled={readOnly}
+            aria-label={`Rate ${i + 1} ${i === 0 ? 'star' : 'stars'}`}
+            aria-pressed={value >= i + 1}
             className={cn(
               'relative transition-transform',
               !readOnly && 'cursor-pointer hover:scale-110',
