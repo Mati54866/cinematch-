@@ -43,11 +43,19 @@ export async function GET(
     const tmdbToMovieId = new Map((movies ?? []).map((m) => [m.tmdb_id, m.id]))
     const movieIds = (movies ?? []).map((m) => m.id)
 
-    const { data: existingRatings } = await admin
+    const { data: existingRatings, error: existingRatingsError } = await admin
       .from('ratings')
       .select('movie_id')
       .eq('user_id', user.id)
       .in('movie_id', movieIds.length > 0 ? movieIds : [0])
+
+    if (existingRatingsError) {
+      console.error('Import preview rating lookup error:', existingRatingsError)
+      return NextResponse.json(
+        { error: 'Failed to check existing ratings' },
+        { status: 500 }
+      )
+    }
 
     const alreadyRatedMovieIds = new Set(
       (existingRatings ?? []).map((r) => r.movie_id)
