@@ -5,7 +5,7 @@ import type { ImportEntry, ImportSource } from './types'
  * Letterboxd CSV format: Date,Name,Year,Letterboxd URI,Rating
  */
 export function parseLetterboxd(text: string): ImportEntry[] {
-  const lines = text.trim().split('\n')
+  const lines = text.trim().split(/\r?\n/)
   if (lines.length < 2) return []
 
   const header = parseCSVLine(lines[0])
@@ -43,7 +43,7 @@ export function parseLetterboxd(text: string): ImportEntry[] {
  * IMDb CSV format: Const,Your Rating,Date Rated,Title,URL,Title Type,IMDb Rating,...,Year,...
  */
 export function parseIMDb(text: string): ImportEntry[] {
-  const lines = text.trim().split('\n')
+  const lines = text.trim().split(/\r?\n/)
   if (lines.length < 2) return []
 
   const header = parseCSVLine(lines[0])
@@ -90,7 +90,7 @@ export function parseIMDb(text: string): ImportEntry[] {
  * Parse a generic CSV with auto-detected columns.
  */
 export function parseGenericCSV(text: string): ImportEntry[] {
-  const lines = text.trim().split('\n')
+  const lines = text.trim().split(/\r?\n/)
   if (lines.length < 2) return []
 
   const header = parseCSVLine(lines[0])
