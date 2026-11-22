@@ -70,6 +70,7 @@ export function backfillRecommendations(
       confidence: Math.max(0.3, candidate.similarity * 0.8),
       match_reasons: ['semantic-match'],
     })
+    validIds.add(candidate.tmdb_id)
     availIdx++
   }
 
