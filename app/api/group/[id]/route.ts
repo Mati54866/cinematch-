@@ -18,6 +18,25 @@ export async function GET(
 
     const admin = createAdminClient()
 
+    const { data: membership, error: membershipError } = await admin
+      .from('group_members')
+      .select('id')
+      .eq('group_id', id)
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    if (membershipError) {
+      console.error('Group membership lookup error:', membershipError)
+      return NextResponse.json(
+        { error: 'Failed to verify group membership' },
+        { status: 500 }
+      )
+    }
+
+    if (!membership) {
+      return NextResponse.json({ error: 'Group not found' }, { status: 404 })
+    }
+
     // Get group details
     const { data: group, error: groupError } = await admin
       .from('groups')
