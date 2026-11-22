@@ -19,11 +19,19 @@ export async function POST(request: NextRequest) {
 
     // Pro plan check
     const admin = createAdminClient()
-    const { data: profile } = await admin
+    const { data: profile, error: profileError } = await admin
       .from('profiles')
       .select('plan')
       .eq('id', user.id)
       .single()
+
+    if (profileError && profileError.code !== 'PGRST116') {
+      console.error('Group plan lookup error:', profileError)
+      return NextResponse.json(
+        { error: 'Failed to verify account plan' },
+        { status: 500 }
+      )
+    }
 
     if (profile?.plan !== 'pro') {
       return NextResponse.json(
