@@ -57,7 +57,9 @@ export function StreamingPicker() {
               whileTap={{ scale: 0.95 }}
               animate={isSelected ? { scale: 1.05 } : { scale: 1 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              type="button"
               onClick={() => toggleProvider(provider.id)}
+              aria-pressed={isSelected}
               className={cn(
                 "flex flex-col items-center gap-3 rounded-xl border-2 p-5 transition-all",
                 isSelected
