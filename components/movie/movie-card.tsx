@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { getPosterUrl, TMDB_GENRES } from '@/lib/tmdb/types'
 import { formatRuntime, getYear } from '@/lib/utils/helpers'
@@ -30,16 +30,15 @@ export function MovieCard({
   streaming,
   className,
 }: MovieCardProps) {
-  const router = useRouter()
   const posterUrl = getPosterUrl(posterPath, 'medium')
   const year = getYear(releaseDate ?? null)
   const genres = (genreIds ?? []).map((id) => TMDB_GENRES[id]).filter(Boolean).slice(0, 2)
 
   return (
-    <div
-      onClick={() => router.push(`/movie/${tmdbId}`)}
+    <Link
+      href={`/movie/${tmdbId}`}
       className={cn(
-        'group relative cursor-pointer overflow-hidden rounded-xl bg-zinc-900 transition-transform duration-200 hover:scale-[1.03] hover:shadow-xl',
+        'group relative block cursor-pointer overflow-hidden rounded-xl bg-zinc-900 transition-transform duration-200 hover:scale-[1.03] hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
         className
       )}
     >
@@ -124,6 +123,6 @@ export function MovieCard({
       <div className="bg-gradient-to-t from-black to-zinc-900 p-3">
         <h3 className="truncate text-sm font-medium text-white">{title}</h3>
       </div>
-    </div>
+    </Link>
   )
 }
