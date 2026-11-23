@@ -50,11 +50,19 @@ export async function POST(request: NextRequest) {
 
     // Fetch taste profile
     const admin = createAdminClient()
-    const { data: tasteProfile } = await admin
+    const { data: tasteProfile, error: tasteProfileError } = await admin
       .from('taste_profiles')
       .select('*')
       .eq('user_id', user.id)
       .single()
+
+    if (tasteProfileError && tasteProfileError.code !== 'PGRST116') {
+      console.error('Taste profile lookup error:', tasteProfileError)
+      return NextResponse.json(
+        { error: 'Failed to fetch taste profile' },
+        { status: 500 }
+      )
+    }
 
     if (!tasteProfile) {
       return NextResponse.json(
