@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   motion,
   useMotionValue,
@@ -96,9 +97,11 @@ export function SwipeCard({ movie, onSwipe, isTop }: SwipeCardProps) {
       {/* Card background */}
       <div className="relative h-full w-full bg-card">
         {posterUrl ? (
-          <img
+          <Image
             src={posterUrl}
             alt={movie.title}
+            fill
+            sizes="280px"
             className="h-full w-full object-cover"
             draggable={false}
           />
