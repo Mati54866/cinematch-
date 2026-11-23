@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useRecommendationStore } from '@/stores/recommendation-store'
 import type { RecommendedMovie, RecommendResponse } from '@/types/recommendation'
 
@@ -27,11 +27,13 @@ export function useRecommendations(): UseRecommendationsReturn {
   const [error, setError] = useState<string | null>(null)
   const [recommendations, setRecommendations] = useState<RecommendedMovie[]>([])
   const [sessionId, setSessionId] = useState('')
+  const requestIdRef = useRef(0)
 
   const store = useRecommendationStore()
 
   const getRecommendations = useCallback(
     async (query: string, options?: UseRecommendationsOptions) => {
+      const requestId = ++requestIdRef.current
       setLoading(true)
       setError(null)
       store.setLoading(true)
@@ -58,6 +60,7 @@ export function useRecommendations(): UseRecommendationsReturn {
         }
 
         const data: RecommendResponse = await response.json()
+        if (requestId !== requestIdRef.current) return
 
         setRecommendations(data.recommendations)
         setSessionId(data.session_id)
@@ -77,17 +80,21 @@ export function useRecommendations(): UseRecommendationsReturn {
           }))
         )
       } catch (err) {
+        if (requestId !== requestIdRef.current) return
         const message = err instanceof Error ? err.message : 'An unexpected error occurred'
         setError(message)
       } finally {
-        setLoading(false)
-        store.setLoading(false)
+        if (requestId === requestIdRef.current) {
+          setLoading(false)
+          store.setLoading(false)
+        }
       }
     },
     [store]
   )
 
   const reset = useCallback(() => {
+    requestIdRef.current++
     setRecommendations([])
     setError(null)
     setSessionId('')
