@@ -15,13 +15,16 @@ const mobileNavItems = [
 
 export function MobileNav() {
   const pathname = usePathname();
-  const { toggleSidebar } = useUIStore();
+  const { sidebarOpen, toggleSidebar } = useUIStore();
 
   return (
     <>
       {/* Top bar with hamburger on mobile */}
       <header className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center border-b border-border bg-card/80 backdrop-blur-md px-4 lg:hidden">
         <button
+          type="button"
+          aria-label={sidebarOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={sidebarOpen}
           onClick={toggleSidebar}
           className="rounded-md p-2 text-muted-foreground hover:text-foreground"
         >
@@ -36,7 +39,10 @@ export function MobileNav() {
       </header>
 
       {/* Bottom navigation on mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-card/95 backdrop-blur-md lg:hidden">
+      <nav
+        aria-label="Mobile navigation"
+        className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-card/95 backdrop-blur-md lg:hidden"
+      >
         <div className="flex items-center justify-around">
           {mobileNavItems.map((item) => {
             const isActive =
@@ -45,6 +51,7 @@ export function MobileNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "flex flex-col items-center gap-1 px-3 py-2 text-xs transition-colors",
                   isActive
