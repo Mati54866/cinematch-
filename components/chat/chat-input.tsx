@@ -66,7 +66,9 @@ export function ChatInput({
         {MOODS.map((mood) => (
           <button
             key={mood.id}
+            type="button"
             onClick={() => toggleMood(mood.id)}
+            aria-pressed={selectedMood === mood.id}
             className={cn(
               'rounded-full border px-3 py-1 text-sm transition-colors',
               selectedMood === mood.id
@@ -89,13 +91,16 @@ export function ChatInput({
           onKeyDown={handleKeyDown}
           onInput={handleInput}
           placeholder={placeholder}
+          aria-label="Describe what you want to watch"
           disabled={loading}
           rows={1}
           className="min-h-[40px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-white placeholder-zinc-500 outline-none disabled:opacity-50"
         />
 
         <button
+          type="button"
           onClick={handleSubmit}
+          aria-label="Get movie recommendations"
           disabled={!value.trim() || loading}
           className={cn(
             'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg transition-colors',
