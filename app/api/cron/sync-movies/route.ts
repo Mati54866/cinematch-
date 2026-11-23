@@ -49,21 +49,27 @@ export async function GET(request: NextRequest) {
 
     // Refresh watch providers for recently synced movies
     const admin = createAdminClient()
-    const { data: recentMovies } = await admin
+    const { data: recentMovies, error: recentMoviesError } = await admin
       .from('movies')
       .select('tmdb_id')
       .order('synced_at', { ascending: false })
       .limit(50)
 
-    if (recentMovies) {
-      for (const movie of recentMovies) {
-        try {
-          await syncWatchProviders(movie.tmdb_id, 'US')
-          stats.providers_refreshed++
-        } catch (err) {
-          const message = err instanceof Error ? err.message : 'Unknown error'
-          stats.errors.push(`Providers ${movie.tmdb_id}: ${message}`)
-        }
+    if (recentMoviesError) {
+      console.error('Failed to fetch movies for provider sync:', recentMoviesError)
+      return NextResponse.json(
+        { error: 'Failed to load movies for provider sync', stats },
+        { status: 500 }
+      )
+    }
+
+    for (const movie of recentMovies ?? []) {
+      try {
+        await syncWatchProviders(movie.tmdb_id, 'US')
+        stats.providers_refreshed++
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error'
+        stats.errors.push(`Providers ${movie.tmdb_id}: ${message}`)
       }
     }
 
