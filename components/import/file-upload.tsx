@@ -109,6 +109,15 @@ export function FileUpload({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => !file && inputRef.current?.click()}
+        onKeyDown={(e) => {
+          if (!file && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault()
+            inputRef.current?.click()
+          }
+        }}
+        role={file ? undefined : 'button'}
+        tabIndex={file ? undefined : 0}
+        aria-label={file ? undefined : 'Choose a file to upload'}
         className={cn(
           'flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-colors',
           dragOver
@@ -129,6 +138,8 @@ export function FileUpload({
               </p>
             </div>
             <button
+              type="button"
+              aria-label="Remove selected file"
               onClick={(e) => {
                 e.stopPropagation()
                 handleRemove()
@@ -167,6 +178,7 @@ export function FileUpload({
       {/* Upload button */}
       {file && (
         <button
+          type="button"
           onClick={handleUploadClick}
           disabled={loading}
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-violet-500 disabled:opacity-50"
