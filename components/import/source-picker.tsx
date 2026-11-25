@@ -62,7 +62,9 @@ export function SourcePicker({ onSelect, selected, className }: SourcePickerProp
         return (
           <button
             key={source.id}
+            type="button"
             onClick={() => onSelect(source.id)}
+            aria-pressed={isSelected}
             className={cn(
               'flex flex-col items-start gap-3 rounded-xl border p-5 text-left transition-all',
               isSelected
