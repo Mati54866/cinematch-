@@ -20,14 +20,14 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
   selectedProviders: [],
   currentStep: 1,
 
-  setGenres: (genres) => set({ selectedGenres: genres }),
+  setGenres: (genres) => set({ selectedGenres: [...new Set(genres)] }),
 
   addRating: (movieId, reaction) =>
     set((state) => ({
       ratings: { ...state.ratings, [movieId]: reaction },
     })),
 
-  setProviders: (providers) => set({ selectedProviders: providers }),
+  setProviders: (providers) => set({ selectedProviders: [...new Set(providers)] }),
 
   nextStep: () =>
     set((state) => ({
