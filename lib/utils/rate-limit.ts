@@ -22,11 +22,15 @@ export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
   const supabase = createAdminClient()
 
   // Get user profile to check plan
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('plan, daily_rec_count, daily_rec_reset')
     .eq('id', userId)
     .single()
+
+  if (profileError && profileError.code !== 'PGRST116') {
+    throw profileError
+  }
 
   if (!profile) {
     return { allowed: false, remaining: 0, limit: 0, reset_at: new Date().toISOString() }
@@ -52,13 +56,15 @@ export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
   if (needsReset) {
     const tomorrow = nextUtcMidnight(now)
 
-    await supabase
+    const { error: resetError } = await supabase
       .from('profiles')
       .update({
         daily_rec_count: 0,
         daily_rec_reset: now.toISOString(),
       })
       .eq('id', userId)
+
+    if (resetError) throw resetError
 
     return {
       allowed: true,
@@ -82,34 +88,29 @@ export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
 
 export async function incrementRateLimit(userId: string): Promise<void> {
   const supabase = createAdminClient()
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('daily_rec_count')
-    .eq('id', userId)
-    .single()
-
-  const currentCount = profile?.daily_rec_count ?? 0
-
-  // Optimistic concurrency: only write if the count is still what we read, so
-  // two simultaneous requests can't both overwrite with the same value.
-  const { data: updated } = await supabase
-    .from('profiles')
-    .update({ daily_rec_count: currentCount + 1 })
-    .eq('id', userId)
-    .eq('daily_rec_count', currentCount)
-    .select('id')
-
-  if (!updated || updated.length === 0) {
-    // Lost the race: re-read and retry once with the fresh value.
-    const { data: fresh } = await supabase
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('daily_rec_count')
       .eq('id', userId)
       .single()
 
-    await supabase
+    if (profileError) throw profileError
+    if (!profile) throw new Error('Profile not found while updating recommendation limit')
+
+    const currentCount = profile.daily_rec_count ?? 0
+
+    // Update only if the count is unchanged, so concurrent requests cannot overwrite one another.
+    const { data: updated, error: updateError } = await supabase
       .from('profiles')
-      .update({ daily_rec_count: (fresh?.daily_rec_count ?? 0) + 1 })
+      .update({ daily_rec_count: currentCount + 1 })
       .eq('id', userId)
+      .eq('daily_rec_count', currentCount)
+      .select('id')
+
+    if (updateError) throw updateError
+    if (updated?.length) return
   }
+
+  throw new Error('Could not update recommendation limit after concurrent changes')
 }
