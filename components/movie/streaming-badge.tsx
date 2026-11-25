@@ -53,16 +53,18 @@ export function StreamingBadge({
     <TooltipProvider delayDuration={200}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div
+          <button
+            type="button"
+            aria-label={`${providerName}: ${label}`}
             className={cn(
-              'overflow-hidden rounded-md ring-2',
+              'appearance-none border-0 bg-transparent p-0 overflow-hidden rounded-md ring-2',
               ringColor,
               dimensions.container
             )}
           >
             <Image
               src={`https://image.tmdb.org/t/p/w45${logoPath}`}
-              alt={providerName}
+              alt=""
               width={dimensions.image}
               height={dimensions.image}
               className="h-full w-full object-cover"
