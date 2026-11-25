@@ -26,7 +26,11 @@ export function useStreamingServices(): UseStreamingServicesReturn {
 
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+      if (authError) {
+        throw new Error(authError.message)
+      }
 
       if (!user) {
         setServices([])
