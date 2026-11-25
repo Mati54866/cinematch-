@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import type { TasteProfile, ReactionType } from '@/types/taste'
 
 interface UseTasteProfileReturn {
@@ -15,8 +15,10 @@ export function useTasteProfile(): UseTasteProfileReturn {
   const [profile, setProfile] = useState<TasteProfile | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const requestIdRef = useRef(0)
 
   const fetchProfile = useCallback(async () => {
+    const requestId = ++requestIdRef.current
     setLoading(true)
     setError(null)
 
@@ -25,7 +27,7 @@ export function useTasteProfile(): UseTasteProfileReturn {
 
       if (!response.ok) {
         if (response.status === 404) {
-          setProfile(null)
+          if (requestId === requestIdRef.current) setProfile(null)
           return
         }
         const data = await response.json()
@@ -33,12 +35,14 @@ export function useTasteProfile(): UseTasteProfileReturn {
       }
 
       const data: TasteProfile = await response.json()
-      setProfile(data)
+      if (requestId === requestIdRef.current) setProfile(data)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'An unexpected error occurred'
-      setError(message)
+      if (requestId === requestIdRef.current) {
+        const message = err instanceof Error ? err.message : 'An unexpected error occurred'
+        setError(message)
+      }
     } finally {
-      setLoading(false)
+      if (requestId === requestIdRef.current) setLoading(false)
     }
   }, [])
 
