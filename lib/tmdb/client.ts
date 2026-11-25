@@ -77,6 +77,7 @@ class RateLimiter {
   private maxTokens: number
   private refillRate: number // tokens per ms
   private lastRefill: number
+  private queue: Promise<void> = Promise.resolve()
 
   constructor(maxRequestsPerSecond: number = 40) {
     this.maxTokens = maxRequestsPerSecond
@@ -93,16 +94,23 @@ class RateLimiter {
   }
 
   async acquire(): Promise<void> {
-    this.refill()
-    if (this.tokens >= 1) {
-      this.tokens -= 1
-      return
+    const acquisition = this.queue.then(() => this.acquireToken())
+    this.queue = acquisition.then(() => undefined, () => undefined)
+    return acquisition
+  }
+
+  private async acquireToken(): Promise<void> {
+    while (true) {
+      this.refill()
+      if (this.tokens >= 1) {
+        this.tokens -= 1
+        return
+      }
+
+      // Wait until a token is available
+      const waitMs = Math.ceil((1 - this.tokens) / this.refillRate)
+      await new Promise((resolve) => setTimeout(resolve, waitMs))
     }
-    // Wait until a token is available
-    const waitMs = Math.ceil((1 - this.tokens) / this.refillRate)
-    await new Promise((resolve) => setTimeout(resolve, waitMs))
-    this.refill()
-    this.tokens -= 1
   }
 }
 
