@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         const customerId = session.customer as string
 
         if (userId) {
-          await admin
+          const { error: updateError } = await admin
             .from('profiles')
             .update({
               plan: 'pro',
@@ -39,6 +39,8 @@ export async function POST(request: NextRequest) {
               stripe_subscription_id: session.subscription as string,
             })
             .eq('id', userId)
+
+          if (updateError) throw updateError
         }
         break
       }
@@ -47,22 +49,25 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription
         const customerId = subscription.customer as string
 
-        const { data: profile } = await admin
+        const { data: profile, error: profileError } = await admin
           .from('profiles')
           .select('id')
           .eq('stripe_customer_id', customerId)
           .single()
 
-        if (profile) {
-          const isActive = ['active', 'trialing'].includes(subscription.status)
-          await admin
-            .from('profiles')
-            .update({
-              plan: isActive ? 'pro' : 'free',
-              stripe_subscription_id: subscription.id,
-            })
-            .eq('id', profile.id)
-        }
+        if (profileError) throw profileError
+        if (!profile) throw new Error('Stripe customer profile not found')
+
+        const isActive = ['active', 'trialing'].includes(subscription.status)
+        const { error: updateError } = await admin
+          .from('profiles')
+          .update({
+            plan: isActive ? 'pro' : 'free',
+            stripe_subscription_id: subscription.id,
+          })
+          .eq('id', profile.id)
+
+        if (updateError) throw updateError
         break
       }
 
@@ -70,21 +75,24 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription
         const customerId = subscription.customer as string
 
-        const { data: profile } = await admin
+        const { data: profile, error: profileError } = await admin
           .from('profiles')
           .select('id')
           .eq('stripe_customer_id', customerId)
           .single()
 
-        if (profile) {
-          await admin
-            .from('profiles')
-            .update({
-              plan: 'free',
-              stripe_subscription_id: null,
-            })
-            .eq('id', profile.id)
-        }
+        if (profileError) throw profileError
+        if (!profile) throw new Error('Stripe customer profile not found')
+
+        const { error: updateError } = await admin
+          .from('profiles')
+          .update({
+            plan: 'free',
+            stripe_subscription_id: null,
+          })
+          .eq('id', profile.id)
+
+        if (updateError) throw updateError
         break
       }
 
