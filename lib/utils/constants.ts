@@ -57,3 +57,33 @@ export const PRO_PLAN_ID = 'pro'
 
 export const TMDB_API_BASE = 'https://api.themoviedb.org/3'
 export const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p'
+
+/** Maximum number of members allowed in a watch group. */
+export const MAX_GROUP_SIZE = 10
+
+/** US content rating labels (MPAA / TVPG). */
+export const CONTENT_RATINGS = [
+  { id: 'G', label: 'G', description: 'General Audiences' },
+  { id: 'PG', label: 'PG', description: 'Parental Guidance Suggested' },
+  { id: 'PG-13', label: 'PG-13', description: 'Parents Strongly Cautioned' },
+  { id: 'R', label: 'R', description: 'Restricted' },
+  { id: 'NC-17', label: 'NC-17', description: 'Adults Only' },
+  { id: 'NR', label: 'NR', description: 'Not Rated' },
+] as const
+
+export type ContentRatingId = (typeof CONTENT_RATINGS)[number]['id']
+
+/** Sorting options for watchlist / recommendation lists. */
+export const SORT_OPTIONS = [
+  { id: 'added_desc', label: 'Recently Added' },
+  { id: 'added_asc', label: 'Oldest Added' },
+  { id: 'rating_desc', label: 'Highest Rated' },
+  { id: 'rating_asc', label: 'Lowest Rated' },
+  { id: 'title_asc', label: 'Title A–Z' },
+  { id: 'title_desc', label: 'Title Z–A' },
+  { id: 'year_desc', label: 'Newest Release' },
+  { id: 'year_asc', label: 'Oldest Release' },
+] as const
+
+export type SortOptionId = (typeof SORT_OPTIONS)[number]['id']
+
