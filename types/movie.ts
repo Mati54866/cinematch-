@@ -92,3 +92,45 @@ export interface UserStreamingService {
   provider_logo: string | null
   created_at: string
 }
+
+/** A franchise or series that a movie belongs to (e.g. "The Avengers Collection"). */
+export interface MovieCollection {
+  id: number
+  name: string
+  poster_path: string | null
+  backdrop_path: string | null
+}
+
+/** A production studio or distributor as returned by TMDB. */
+export interface ProductionCompany {
+  id: number
+  name: string
+  logo_path: string | null
+  origin_country: string
+}
+
+/**
+ * A unified credit entry combining both acting and crew roles so a single
+ * person can appear on a movie's full credits list regardless of department.
+ */
+export interface PersonCredit {
+  id: number
+  name: string
+  profile_path: string | null
+  /** Set for cast members. */
+  character?: string
+  /** Set for crew members. */
+  job?: string
+  department?: string
+  /** Display order: lower values appear first (cast only). */
+  order?: number
+}
+
+/** Extended movie detail including collection and company metadata. */
+export interface MovieDetailFull extends MovieDetail {
+  collection: MovieCollection | null
+  production_companies: ProductionCompany[]
+  credits: PersonCredit[]
+  content_rating: string | null
+}
+
