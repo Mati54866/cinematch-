@@ -78,3 +78,41 @@ export function uniqueBy<T>(array: T[], key: keyof T): T[] {
     return true
   })
 }
+
+/**
+ * Format a TMDB vote_average (0–10) as a one-decimal string.
+ * Returns 'N/A' for null, undefined, or out-of-range values.
+ */
+export function formatVoteAverage(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value) || value < 0 || value > 10) return 'N/A'
+  return value.toFixed(1)
+}
+
+/**
+ * Return `singular` when count is exactly 1, otherwise `plural`.
+ * Falls back to appending 's' when no plural is provided.
+ *
+ * @example pluralize(1, 'movie') → 'movie'
+ * @example pluralize(2, 'movie') → 'movies'
+ * @example pluralize(2, 'match', 'matches') → 'matches'
+ */
+export function pluralize(count: number, singular: string, plural?: string): string {
+  return count === 1 ? singular : (plural ?? `${singular}s`)
+}
+
+/**
+ * Format a large integer into a compact human-readable string.
+ *
+ * @example formatCompactNumber(1234) → '1.2K'
+ * @example formatCompactNumber(1_500_000) → '1.5M'
+ */
+export function formatCompactNumber(value: number): string {
+  if (!Number.isFinite(value)) return 'N/A'
+  if (Math.abs(value) >= 1_000_000) {
+    return `${(value / 1_000_000).toFixed(1)}M`
+  }
+  if (Math.abs(value) >= 1_000) {
+    return `${(value / 1_000).toFixed(1)}K`
+  }
+  return String(value)
+}
